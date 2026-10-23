@@ -48,60 +48,411 @@ main{max-width:1150px;margin:auto;padding:28px 16px 50px}.hero{margin-bottom:23p
 <p class="hint" style="margin-top:17px">Use audio you own or have permission to modify. 8D is a stereo panning effect, not a guaranteed true binaural recording. Effect quality depends on the source track, playback equipment, and browser support.</p>
 </main>
 <script>
-(()=>{
-const canvas=document.getElementById('viz'),c=canvas.getContext('2d');
-const file=document.getElementById('file'),play=document.getElementById('play'),stop=document.getElementById('stop'),seek=document.getElementById('seek'),time=document.getElementById('time'),status=document.getElementById('status'),recordBtn=document.getElementById('record');
-let audio=null,ctx=null,analyser=null,source=null,panner=null,bass=null,mid=null,treble=null,delay=null,feedback=null,wet=null,dry=null,master=null,dest=null,convolver=null,impulse=null,mode='8d',amount=.7,rotation=.5,rec=null,chunks=[],raf=0;
-function say(s){status.textContent=s}function fmt(t){t=Math.max(0,t||0);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0')}
-function makeImpulse(ac,seconds=2.8,decay=2.4){let len=ac.sampleRate*seconds,b=ac.createBuffer(2,len,ac.sampleRate);for(let ch=0;ch<2;ch++){let d=b.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}return b}
-function init(){
- if(ctx)return;
- const AudioContextClass=window.AudioContext||window.webkitAudioContext;
- if(!AudioContextClass)throw new Error('Web Audio is not supported in this browser.');
- ctx=new AudioContextClass();analyser=ctx.createAnalyser();analyser.fftSize=512;analyser.smoothingTimeConstant=.82;
- panner=ctx.createStereoPanner();bass=ctx.createBiquadFilter();bass.type='lowshelf';bass.frequency.value=150;bass.gain.value=0;
- mid=ctx.createBiquadFilter();mid.type='peaking';mid.frequency.value=1000;mid.Q.value=1;mid.gain.value=0;
- treble=ctx.createBiquadFilter();treble.type='highshelf';treble.frequency.value=5000;treble.gain.value=0;
- delay=ctx.createDelay(1);delay.delayTime.value=.28;feedback=ctx.createGain();feedback.gain.value=.18;wet=ctx.createGain();wet.gain.value=0;dry=ctx.createGain();dry.gain.value=1;
- convolver=ctx.createConvolver();convolver.buffer=makeImpulse(ctx);master=ctx.createGain();dest=ctx.createMediaStreamDestination();
- // Base EQ chain -> spatial panner -> dry output. Delay and reverb are parallel effect paths.
- source=ctx.createMediaElementSource(audio);source.connect(bass);bass.connect(mid);mid.connect(treble);treble.connect(panner);panner.connect(dry);dry.connect(master);
- panner.connect(delay);delay.connect(feedback);feedback.connect(delay);delay.connect(wet);wet.connect(master);
- panner.connect(convolver);convolver.connect(wet);
- master.connect(analyser);analyser.connect(ctx.destination);analyser.connect(dest);
-}
-function applyMode(){
- if(!ctx)return;
- bass.gain.value=mode==='bass'?amount*18:mode==='slowed'?amount*3:0;
- mid.gain.value=mode==='bass'?amount*2:0;
- treble.gain.value=mode==='bass'?amount*2:0;
- wet.gain.value=(mode==='echo'?amount*.65:mode==='concert'?amount*.5:mode==='slowed'?amount*.58:0);
- feedback.gain.value=mode==='echo'?.22+amount*.38:.15;
- delay.delayTime.value=mode==='echo'?.22+amount*.28:.32;
- dry.gain.value=mode==='concert'?1-amount*.2:1;
- audio.playbackRate=mode==='slowed'?1-amount*.28:mode==='nightcore'?1+amount*.32:1;
- audio.preservesPitch=false;
- document.getElementById('activeMode').textContent=({8d:'8D ROTATION',bass:'BASS BOOST',slowed:'SLOWED + REVERB',nightcore:'NIGHTCORE',echo:'ECHO SPACE',concert:'CONCERT HALL',mono:'MONO CENTER',clean:'ORIGINAL / CLEAN'})[mode];
- document.getElementById('visualLabel').textContent=mode==='8d'?'LEFT ◀ · SOUND MOVES AROUND YOU · ▶ RIGHT':mode==='mono'?'CENTERED SOUND · MONO MODE':mode.toUpperCase()+' · AUDIO EFFECT ACTIVE';
-}
-document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;applyMode();say('Mode selected: '+b.querySelector('strong').textContent)}));
-document.getElementById('amount').addEventListener('input',e=>{amount=+e.target.value/100;document.getElementById('amountVal').textContent=e.target.value+'%';applyMode()});
-document.getElementById('rotation').addEventListener('input',e=>{rotation=+e.target.value/100;document.getElementById('rotationVal').textContent=e.target.value+'%'});
-file.addEventListener('change',()=>{let f=file.files&&file.files[0];if(!f)return;if(audio){audio.pause();URL.revokeObjectURL(audio.src)}audio=new Audio();audio.preload='metadata';audio.src=URL.createObjectURL(f);audio.load();
- document.getElementById('filename').textContent=f.name;
- say('Selected: '+f.name+' — loading audio…');
- audio.addEventListener('loadedmetadata',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=false;time.textContent='00:00 / '+fmt(audio.duration);say('Track loaded. Choose a mode and press Play.')},{once:true});
- audio.addEventListener('canplay',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=false;say('Audio ready. Choose a mode and press Play.')},{once:true});
- audio.addEventListener('error',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=true;let code=audio.error?audio.error.code:0;let msg=code===4?'This audio format is not supported here. Try a standard MP3 file.':code===2?'File could not be read. Copy it to Downloads and select it again.':'Audio could not load. Try another MP3/WAV file.';say(msg);time.textContent='00:00 / 00:00';});});
-play.addEventListener('click',async()=>{if(!audio)return;try{init();if(ctx.state==='suspended')await ctx.resume();applyMode();if(!audio.paused){audio.pause();play.textContent='▶ Play';say('Paused.')}else{await audio.play();play.textContent='Ⅱ Pause';say('Playing processed audio. Headphones recommended.')}}catch(e){say('Playback failed. Try another audio file or current Chrome/Edge.')}});
-stop.addEventListener('click',()=>{if(!audio)return;audio.pause();audio.currentTime=0;play.textContent='▶ Play';say('Stopped.')});seek.addEventListener('input',()=>{if(audio&&isFinite(audio.duration))audio.currentTime=seek.value/1000*audio.duration});
-recordBtn.addEventListener('click',async()=>{if(!audio)return;try{init();if(ctx.state==='suspended')await ctx.resume();applyMode();if(rec&&rec.state==='recording'){rec.stop();return}
- if(!window.MediaRecorder){say('This browser does not support recording. Try desktop Chrome or Edge.');return}
- const stream=dest.stream;chunks=[];let opts={};if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))opts.mimeType='audio/webm;codecs=opus';rec=new MediaRecorder(stream,opts);rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{let blob=new Blob(chunks,{type:rec.mimeType||'audio/webm'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='BeatMorph-processed-audio.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);recordBtn.textContent='● Record & Export Audio';say('Export saved as WebM audio. Convert to MP3/WAV in an audio editor if needed.')};rec.start();recordBtn.textContent='■ Stop & Save';say('Recording processed audio now. Press Stop & Save when finished.');}catch(e){say('Recording could not start. Try Chrome or Edge.')}});
-function draw(t){let w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;let grad=c.createRadialGradient(cx,cy,20,cx,cy,w*.65);grad.addColorStop(0,'#28104b');grad.addColorStop(1,'#03030a');c.fillStyle=grad;c.fillRect(0,0,w,h);let energy=.15,arr=null;if(analyser){arr=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(arr);energy=arr.reduce((a,b)=>a+b,0)/(arr.length*255)}let spin=t*.00045*rotation*(mode==='8d'?1:.35);for(let ring=0;ring<15;ring++){let radius=25+((ring/15+(t*.000035*rotation)%1)*230);c.beginPath();for(let i=0;i<=180;i++){let a=i/180*Math.PI*2+spin;let v=arr?arr[Math.floor(i/180*arr.length)]/255:energy;let r=radius+v*18*amount;let x=cx+Math.cos(a)*r*1.35,y=cy+Math.sin(a)*r*.72;if(i===0)c.moveTo(x,y);else c.lineTo(x,y)}c.closePath();c.strokeStyle=`hsla(${275+ring*5},100%,${50+ring*2}%,${.15+ring*.045})`;c.lineWidth=1+ring*.09;c.shadowBlur=15;c.shadowColor='#a855f7';c.stroke()}c.shadowBlur=0;for(let i=0;i<90;i++){let a=i*2.399+t*.00015*rotation,r=70+(i%30)*6;let x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r*.65;c.fillStyle=`hsla(${185+i%100},100%,70%,.6)`;c.fillRect(x,y,2,2)}c.textAlign='center';c.font='bold 20px system-ui';c.fillStyle='#ffffffbb';c.fillText('BEATMORPH',cx,h-22);raf=requestAnimationFrame(draw)}draw(0);
+
+(() => {
+  const $ = id => document.getElementById(id);
+
+  const file = $("file");
+  const play = $("play");
+  const stop = $("stop");
+  const seek = $("seek");
+  const time = $("time");
+  const status = $("status");
+  const recordBtn = $("record");
+
+  let audio = null;
+  let objectURL = null;
+  let ctx = null;
+  let source = null;
+  let bass, mid, treble, panner, master, analyser;
+  let delay, feedback, echoGain, dry, convolver;
+  let mode = "8d";
+  let amount = 0.7;
+  let rotation = 0.5;
+  let recorder = null;
+  let chunks = [];
+  let loadingId = 0;
+
+  function say(message) {
+    status.textContent = message;
+  }
+
+  function fmt(seconds) {
+    if (!Number.isFinite(seconds)) return "00:00";
+    seconds = Math.max(0, seconds);
+    return String(Math.floor(seconds / 60)).padStart(2, "0") +
+      ":" + String(Math.floor(seconds % 60)).padStart(2, "0");
+  }
+
+  function setButtons(enabled) {
+    play.disabled = !enabled;
+    stop.disabled = !enabled;
+    seek.disabled = !enabled;
+    recordBtn.disabled = !enabled;
+  }
+
+  function createImpulse() {
+    const length = ctx.sampleRate * 2;
+    const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
+
+    for (let channel = 0; channel < 2; channel++) {
+      const data = buffer.getChannelData(channel);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) *
+          Math.pow(1 - i / length, 2.5);
+      }
+    }
+    return buffer;
+  }
+
+  function initAudio() {
+    if (ctx) return;
+
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      throw new Error("Please open this app in Chrome.");
+    }
+
+    ctx = new AudioContextClass();
+
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+
+    bass = ctx.createBiquadFilter();
+    bass.type = "lowshelf";
+    bass.frequency.value = 150;
+
+    mid = ctx.createBiquadFilter();
+    mid.type = "peaking";
+    mid.frequency.value = 1000;
+    mid.Q.value = 1;
+
+    treble = ctx.createBiquadFilter();
+    treble.type = "highshelf";
+    treble.frequency.value = 5000;
+
+    panner = ctx.createStereoPanner();
+
+    dry = ctx.createGain();
+    echoGain = ctx.createGain();
+    delay = ctx.createDelay(1);
+    feedback = ctx.createGain();
+
+    delay.delayTime.value = 0.28;
+    feedback.gain.value = 0.2;
+
+    convolver = ctx.createConvolver();
+    convolver.buffer = createImpulse();
+
+    master = ctx.createGain();
+
+    source = ctx.createMediaElementSource(audio);
+
+    source.connect(bass);
+    bass.connect(mid);
+    mid.connect(treble);
+    treble.connect(panner);
+
+    panner.connect(dry);
+    dry.connect(master);
+
+    panner.connect(delay);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    delay.connect(echoGain);
+    echoGain.connect(master);
+
+    panner.connect(convolver);
+    convolver.connect(master);
+
+    master.connect(analyser);
+    analyser.connect(ctx.destination);
+
+    applyMode();
+  }
+
+  function applyMode() {
+    if (ctx && bass) {
+      bass.gain.value =
+        mode === "bass" ? amount * 18 : 0;
+
+      mid.gain.value =
+        mode === "bass" ? amount * 3 : 0;
+
+      treble.gain.value =
+        mode === "bass" ? amount * 2 : 0;
+
+      echoGain.gain.value =
+        mode === "echo" ? amount * 0.6 :
+        mode === "slowed" ? amount * 0.35 : 0;
+
+      feedback.gain.value =
+        mode === "echo" ? 0.25 + amount * 0.3 : 0.18;
+
+      delay.delayTime.value =
+        mode === "echo" ? 0.22 + amount * 0.25 : 0.3;
+
+      dry.gain.value =
+        mode === "concert" ? 1 - amount * 0.25 : 1;
+
+      convolver.normalize = true;
+      convolver.connect(master);
+    }
+
+    if (audio) {
+      audio.playbackRate =
+        mode === "slowed" ? 1 - amount * 0.3 :
+        mode === "nightcore" ? 1 + amount * 0.3 : 1;
+
+      audio.preservesPitch = false;
+    }
+
+    const labels = {
+      "8d": "8D ROTATION",
+      bass: "BASS BOOST",
+      slowed: "SLOWED + REVERB",
+      nightcore: "NIGHTCORE",
+      echo: "ECHO SPACE",
+      concert: "CONCERT HALL",
+      mono: "MONO CENTER",
+      clean: "ORIGINAL / CLEAN"
+    };
+
+    $("activeMode").textContent = labels[mode];
+
+    document.querySelectorAll(".mode").forEach(button => {
+      button.classList.toggle("active", button.dataset.mode === mode);
+    });
+  }
+
+  file.addEventListener("change", () => {
+    const f = file.files && file.files[0];
+    if (!f) return;
+
+    const id = ++loadingId;
+
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    }
+
+    if (objectURL) URL.revokeObjectURL(objectURL);
+
+    audio = new Audio();
+    audio.preload = "auto";
+    audio.playsInline = true;
+    objectURL = URL.createObjectURL(f);
+    audio.src = objectURL;
+
+    $("filename").textContent = f.name;
+    time.textContent = "00:00 / 00:00";
+    seek.value = 0;
+    setButtons(false);
+    say("Loading audio: " + f.name);
+
+    audio.addEventListener("loadedmetadata", () => {
+      if (id !== loadingId) return;
+
+      time.textContent = "00:00 / " + fmt(audio.duration);
+      setButtons(true);
+      say("Song loaded. Choose a mode and press Play.");
+    });
+
+    audio.addEventListener("canplay", () => {
+      if (id !== loadingId) return;
+      setButtons(true);
+      say("Audio ready. Press Play.");
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!audio || id !== loadingId) return;
+
+      time.textContent =
+        fmt(audio.currentTime) + " / " + fmt(audio.duration);
+
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        seek.value = audio.currentTime / audio.duration * 1000;
+      }
+    });
+
+    audio.addEventListener("ended", () => {
+      play.textContent = "▶ Play";
+      say("Song finished.");
+    });
+
+    audio.addEventListener("error", () => {
+      if (id !== loadingId) return;
+
+      setButtons(false);
+
+      const code = audio.error ? audio.error.code : 0;
+
+      if (code === 4) {
+        say("Audio format unsupported. Try another standard MP3 file.");
+      } else if (code === 3) {
+        say("Audio decoding failed. Try a different MP3 or WAV.");
+      } else {
+        say("Audio could not load. Try selecting the song again.");
+      }
+    });
+
+    audio.load();
+  });
+
+  document.querySelectorAll(".mode").forEach(button => {
+    button.addEventListener("click", () => {
+      mode = button.dataset.mode;
+      applyMode();
+
+      say(audio
+        ? "Mode selected: " + button.querySelector("strong").textContent
+        : "Mode selected. Upload a song to begin.");
+    });
+  });
+
+  $("amount").addEventListener("input", event => {
+    amount = Number(event.target.value) / 100;
+    $("amountVal").textContent = event.target.value + "%";
+    applyMode();
+  });
+
+  $("rotation").addEventListener("input", event => {
+    rotation = Number(event.target.value) / 100;
+    $("rotationVal").textContent = event.target.value + "%";
+  });
+
+  play.addEventListener("click", async () => {
+    if (!audio) {
+      say("Please select a song first.");
+      return;
+    }
+
+    try {
+      initAudio();
+
+      if (ctx.state === "suspended") await ctx.resume();
+
+      applyMode();
+
+      if (audio.paused) {
+        await audio.play();
+        play.textContent = "Ⅱ Pause";
+        say("Playing audio.");
+      } else {
+        audio.pause();
+        play.textContent = "▶ Play";
+        say("Paused.");
+      }
+    } catch (error) {
+      say("Playback error: " + error.message);
+    }
+  });
+
+  stop.addEventListener("click", () => {
+    if (!audio) return;
+
+    audio.pause();
+    audio.currentTime = 0;
+    play.textContent = "▶ Play";
+    say("Stopped.");
+  });
+
+  seek.addEventListener("input", () => {
+    if (audio && Number.isFinite(audio.duration)) {
+      audio.currentTime = Number(seek.value) / 1000 * audio.duration;
+    }
+  });
+
+  recordBtn.addEventListener("click", async () => {
+    if (!audio) return;
+
+    try {
+      initAudio();
+
+      if (ctx.state === "suspended") await ctx.resume();
+
+      if (!window.MediaRecorder) {
+        say("Recording is not supported by this browser.");
+        return;
+      }
+
+      if (recorder && recorder.state === "recording") {
+        recorder.stop();
+        return;
+      }
+
+      const output = ctx.createMediaStreamDestination();
+      master.connect(output);
+
+      chunks = [];
+      recorder = new MediaRecorder(output.stream);
+
+      recorder.ondataavailable = event => {
+        if (event.data.size) chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, {
+          type: recorder.mimeType || "audio/webm"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "BeatMorph-processed.webm";
+        link.click();
+
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        recordBtn.textContent = "● Record & Export Audio";
+        say("Processed audio exported as WebM.");
+        master.disconnect(output);
+      };
+
+      recorder.start();
+      recordBtn.textContent = "■ Stop & Save";
+      say("Recording started. Press Stop & Save when finished.");
+    } catch (error) {
+      say("Recording error: " + error.message);
+    }
+  });
+
+  // Keep the visualization running.
+  const canvas = $("viz");
+  const c = canvas.getContext("2d");
+
+  function draw() {
+    const w = canvas.width;
+    const h = canvas.height;
+
+    c.fillStyle = "#05050c";
+    c.fillRect(0, 0, w, h);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const data = new Uint8Array(256);
+
+    if (analyser) analyser.getByteFrequencyData(data);
+
+    for (let i = 0; i < 80; i++) {
+      const angle = i * Math.PI * 2 / 80;
+      const value = analyser ? data[i] / 255 : 0.12;
+      const radius = 55 + value * 130;
+
+      c.fillStyle = `hsl(${270 + i}, 90%, 65%)`;
+      c.fillRect(
+        cx + Math.cos(angle) * radius - 2,
+        cy + Math.sin(angle) * radius * 0.65 - 2,
+        4, 4
+      );
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
 })();
-if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
-}
-</script>
+
 </body></html>
