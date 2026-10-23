@@ -1,462 +1,312 @@
+
 <!doctype html>
 <html lang="hi">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090914"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131c">
 <title>BeatMorph Audio Lab</title>
+
 <style>
-:root{--bg:#090914;--panel:#141425;--line:#302d4b;--txt:#f8f7ff;--muted:#aaa7c5;--purple:#a855f7;--cyan:#22d3ee}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#281047 0,transparent 43%),var(--bg);color:var(--txt);font:15px/1.5 system-ui,Arial,sans-serif}
-header{padding:22px clamp(16px,4vw,45px);border-bottom:1px solid #ffffff14;display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.logo{font-size:23px;font-weight:900;letter-spacing:.1em}.logo span{color:#c084fc}.sub{font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
-main{max-width:1150px;margin:auto;padding:28px 16px 50px}.hero{margin-bottom:23px}.hero h1{font-size:clamp(29px,5vw,48px);line-height:1.1;margin:0 0 10px}.hero p{color:var(--muted);max-width:720px;margin:0}.layout{display:grid;grid-template-columns:1fr 330px;gap:17px}.card{background:linear-gradient(145deg,#171729,#10101b);border:1px solid var(--line);border-radius:18px;overflow:hidden}.cardhead{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.cardhead b{font-size:12px;letter-spacing:.12em}.pill{border:1px solid #64408a;border-radius:99px;padding:5px 10px;font-size:11px;color:#e9d5ff}
-.visual{height:265px;position:relative;background:#05050c;overflow:hidden}.visual canvas{width:100%;height:100%;display:block}.vislabel{position:absolute;bottom:13px;left:16px;color:#e9d5ff;font-size:11px;letter-spacing:.16em}
-.controls{padding:18px;display:flex;flex-direction:column;gap:17px}.section{font-size:11px;color:#c4b5fd;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px}.file{padding:14px;border:1px dashed #5b4776;border-radius:12px;background:#ffffff04}.file input{width:100%;color:var(--muted);font-size:12px}.filename{color:#c4b5fd;font-size:12px;overflow-wrap:anywhere;margin-top:7px}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mode{padding:12px 10px;text-align:left;color:#f5f3ff;background:#0c0c18;border:1px solid #34314e;border-radius:12px;cursor:pointer;min-height:76px}.mode strong{display:block;font-size:13px}.mode small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.mode.active{border-color:#c084fc;background:linear-gradient(145deg,#32134b,#171226);box-shadow:0 0 0 1px #a855f744}.field label{display:flex;justify-content:space-between;color:#ded9ef;font-size:12px;margin-bottom:6px}.field input{width:100%;accent-color:#c084fc}.buttons{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid #42395d;background:#211a34;color:#fff;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer}.btn.primary{background:linear-gradient(100deg,#9333ea,#6d28d9);border:0}.btn:disabled{opacity:.4;cursor:not-allowed}.full{width:100%}.transport{display:flex;gap:9px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);flex-wrap:wrap}.time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.seek{flex:1;min-width:100px;accent-color:#c084fc}.status{color:#a5f3fc;font-size:12px;min-height:18px}.hint{font-size:11px;color:#8f8ba9}.bottom{margin-top:17px;padding:16px 18px}.bottom h3{margin:0 0 8px;font-size:13px}.bottom p{color:var(--muted);font-size:12px;margin:0}.tagrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{background:#201832;border:1px solid #3b2c54;padding:5px 9px;border-radius:99px;font-size:11px;color:#e9d5ff}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.visual{height:220px}}@media(max-width:480px){.modes{grid-template-columns:1fr 1fr}.hero h1{font-size:31px}}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0e15;color:#f4f6ff;font-family:Arial,sans-serif}
+main{max-width:850px;margin:auto;padding:20px}
+header{text-align:center;padding:15px}
+h1{font-size:38px;margin:5px}
+p{color:#b5bfd3}
+.panel{background:#151a26;border:1px solid #30384d;border-radius:18px;padding:16px;margin:15px 0}
+button{padding:12px;border:1px solid #39425b;border-radius:11px;background:#252c40;color:white;font-size:15px;cursor:pointer}
+button:disabled{opacity:.5}
+.primary{background:#9b8cff;color:#111;border:0;font-weight:bold}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+#audio{width:100%;margin-top:15px}
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.mode{text-align:left;min-height:65px}
+.mode strong,.mode small{display:block}
+.mode small{color:#bbc3d6;margin-top:5px}
+.mode.active{border-color:#a697ff;background:#393052}
+input[type=range]{width:100%;accent-color:#a697ff}
+label{display:block;margin:16px 0 6px}
+#status{font-size:14px;overflow-wrap:anywhere}
+canvas{width:100%;height:90px;background:#080b11;border-radius:10px;margin-top:12px}
+@media(max-width:420px){main{padding:10px}.modes{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><div><div class="logo">BEAT<span>MORPH</span></div><div class="sub">Audio transformation lab</div></div><div class="pill">BETA · LOCAL AUDIO PROCESSING</div></header>
 <main>
-<div class="hero"><h1>Feel your music <span style="color:#c084fc">in a new dimension.</span></h1><p>Upload a song, choose an audio effect mode, listen with headphones, then record the processed output. The effects change the sound itself—not just the visualizer.</p></div>
-<div class="layout">
-<section>
-<div class="card">
-<div class="cardhead"><b>SPATIAL AUDIO PREVIEW</b><span class="pill" id="activeMode">8D ROTATION</span></div>
-<div class="visual"><canvas id="viz" width="1000" height="500"></canvas><div class="vislabel" id="visualLabel">LEFT ◀ · SOUND MOVES AROUND YOU · ▶ RIGHT</div></div>
-<div class="transport"><button class="btn primary" id="play" disabled>▶ Play</button><button class="btn" id="stop" disabled>■ Stop</button><input class="seek" id="seek" type="range" min="0" max="1000" value="0" disabled><span class="time" id="time">00:00 / 00:00</span></div>
+<header>
+<h1>BeatMorph</h1>
+<p>Audio Lab — Apne music ko naye effects do 🎧</p>
+</header>
+
+<section class="panel">
+<h3>1. Apna song select karo</h3>
+<div class="row">
+<input type="file" id="file" accept="audio/*">
+<button id="play" class="primary" disabled>▶ Play</button>
+<button id="stop" disabled>■ Stop</button>
 </div>
-<div class="card bottom"><h3>What the modes change</h3><p>8D rotates stereo position; Bass Boost enhances low frequencies; Slowed + Reverb lowers playback speed and adds an echoing space; Nightcore raises speed and pitch; Echo adds repeats; Concert adds a spacious reverberant feel.</p><div class="tagrow"><span class="tag">🎧 Headphones recommended</span><span class="tag">🎵 MP3 / WAV</span><span class="tag">⬇ Export processed audio</span></div></div>
+<audio id="audio" controls></audio>
+<p id="status">Pehle apna audio file select karo.</p>
+<canvas id="viz" width="800" height="90"></canvas>
 </section>
-<aside class="card controls">
-<div><div class="section">01 / Upload a song</div><div class="file"><input id="file" type="file" accept="audio/*"><div class="filename" id="filename">Choose an audio file from your laptop.</div></div></div>
-<div><div class="section">02 / Choose audio mode</div><div class="modes">
-<button class="mode active" data-mode="8d"><strong>🌀 8D Audio</strong><small>Rotating left ↔ right</small></button>
-<button class="mode" data-mode="bass"><strong>💥 Bass Boost</strong><small>Deeper low end</small></button>
-<button class="mode" data-mode="slowed"><strong>🌙 Slowed + Reverb</strong><small>Slower, spacious sound</small></button>
-<button class="mode" data-mode="nightcore"><strong>⚡ Nightcore</strong><small>Faster, higher pitch</small></button>
-<button class="mode" data-mode="echo"><strong>🌌 Echo Space</strong><small>Repeating delay</small></button>
-<button class="mode" data-mode="concert"><strong>🏛️ Concert Hall</strong><small>Room-like reverb</small></button>
-<button class="mode" data-mode="mono"><strong>🎙️ Mono Center</strong><small>Centered sound</small></button>
-<button class="mode" data-mode="clean"><strong>✨ Original / Clean</strong><small>Effects bypassed</small></button>
-</div></div>
-<div class="field"><label for="amount">Effect intensity <span id="amountVal">70%</span></label><input id="amount" type="range" min="0" max="100" value="70"></div>
-<div class="field"><label for="rotation">8D rotation speed <span id="rotationVal">50%</span></label><input id="rotation" type="range" min="10" max="100" value="50"></div>
-<div><div class="section">03 / Export processed track</div><button class="btn primary full" id="record" disabled>● Record & Export Audio</button><div class="status" id="status" style="margin-top:9px">Upload a song to begin.</div></div>
-<p class="hint">Exports in browser-supported WebM audio format. Re-import it into an editor if you need MP3/WAV. No audio is uploaded to a server.</p>
-</aside>
+
+<section class="panel">
+<h3>2. Audio mode select karo</h3>
+<div class="modes">
+<button class="mode active" data-mode="original"><strong>Original / Clean</strong><small>Normal sound</small></button>
+<button class="mode" data-mode="8d"><strong>🎧 8D Audio</strong><small>Left ↔ Right movement</small></button>
+<button class="mode" data-mode="bass"><strong>🔊 Bass Boost</strong><small>Heavy bass</small></button>
+<button class="mode" data-mode="slowed"><strong>🐢 Slowed + Reverb</strong><small>Slow music + space</small></button>
+<button class="mode" data-mode="nightcore"><strong>⚡ Nightcore</strong><small>Fast music</small></button>
+<button class="mode" data-mode="echo"><strong>🔁 Echo</strong><small>Repeating sound</small></button>
+<button class="mode" data-mode="concert"><strong>🏟 Concert Hall</strong><small>Hall reverb</small></button>
+<button class="mode" data-mode="mono"><strong>🎙 Mono Center</strong><small>Center sound</small></button>
 </div>
-<p class="hint" style="margin-top:17px">Use audio you own or have permission to modify. 8D is a stereo panning effect, not a guaranteed true binaural recording. Effect quality depends on the source track, playback equipment, and browser support.</p>
+</section>
+
+<section class="panel">
+<h3>3. Effect settings</h3>
+<label>Effect Strength: <span id="strengthValue">70%</span></label>
+<input type="range" id="strength" min="0" max="100" value="70">
+<label>Volume: <span id="volumeValue">80%</span></label>
+<input type="range" id="volume" min="0" max="100" value="80">
+<p>8D effect ko achchhe se sunne ke liye stereo headphones use karo.</p>
+</section>
 </main>
+
 <script>
-
 (() => {
-  const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
+const audio = $("audio");
+const fileInput = $("file");
+const playBtn = $("play");
+const stopBtn = $("stop");
+const status = $("status");
+const strength = $("strength");
+const volume = $("volume");
+const canvas = $("viz");
+const canvasCtx = canvas.getContext("2d");
 
-  const file = $("file");
-  const play = $("play");
-  const stop = $("stop");
-  const seek = $("seek");
-  const time = $("time");
-  const status = $("status");
-  const recordBtn = $("record");
+let ac = null;
+let source, bass, panner, master, analyser;
+let dry, reverb, reverbGain, delay, delayGain, feedback;
+let mode = "original";
+let panTimer = null;
+let panPhase = 0;
+let objectURL = null;
 
-  let audio = null;
-  let objectURL = null;
-  let ctx = null;
-  let source = null;
-  let bass, mid, treble, panner, master, analyser;
-  let delay, feedback, echoGain, dry, convolver;
-  let mode = "8d";
-  let amount = 0.7;
-  let rotation = 0.5;
-  let recorder = null;
-  let chunks = [];
-  let loadingId = 0;
+function say(message){ status.textContent = message; }
 
-  function say(message) {
-    status.textContent = message;
+function makeImpulse(seconds=2.5){
+  const length = Math.floor(ac.sampleRate * seconds);
+  const buffer = ac.createBuffer(2,length,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const data=buffer.getChannelData(ch);
+    for(let i=0;i<length;i++){
+      data[i]=(Math.random()*2-1)*Math.pow(1-i/length,2.5);
+    }
+  }
+  return buffer;
+}
+
+function initAudio(){
+  if(ac) return true;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if(!AudioContextClass){
+    say("Web Audio support nahi hai. Updated Chrome use karo.");
+    return false;
   }
 
-  function fmt(seconds) {
-    if (!Number.isFinite(seconds)) return "00:00";
-    seconds = Math.max(0, seconds);
-    return String(Math.floor(seconds / 60)).padStart(2, "0") +
-      ":" + String(Math.floor(seconds % 60)).padStart(2, "0");
+  ac = new AudioContextClass();
+  source = ac.createMediaElementSource(audio);
+
+  bass = ac.createBiquadFilter();
+  bass.type = "lowshelf";
+  bass.frequency.value = 150;
+
+  panner = ac.createStereoPanner();
+  dry = ac.createGain();
+  dry.gain.value = 1;
+
+  reverb = ac.createConvolver();
+  reverb.buffer = makeImpulse();
+  reverbGain = ac.createGain();
+  reverbGain.gain.value = 0;
+
+  delay = ac.createDelay(1);
+  delay.delayTime.value = 0.3;
+  feedback = ac.createGain();
+  feedback.gain.value = 0;
+  delayGain = ac.createGain();
+  delayGain.gain.value = 0;
+
+  master = ac.createGain();
+  master.gain.value = Number(volume.value)/100;
+
+  analyser = ac.createAnalyser();
+  analyser.fftSize = 256;
+
+  source.connect(bass);
+  bass.connect(panner);
+
+  panner.connect(dry);
+  dry.connect(master);
+
+  panner.connect(reverb);
+  reverb.connect(reverbGain);
+  reverbGain.connect(master);
+
+  panner.connect(delay);
+  delay.connect(delayGain);
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delayGain.connect(master);
+
+  master.connect(analyser);
+  analyser.connect(ac.destination);
+
+  drawVisualizer();
+  applyMode();
+  return true;
+}
+
+function stopPan(){
+  if(panTimer){
+    clearInterval(panTimer);
+    panTimer=null;
+  }
+  if(ac && panner){
+    panner.pan.setTargetAtTime(0,ac.currentTime,0.15);
+  }
+}
+
+function startPan(){
+  if(panTimer) clearInterval(panTimer);
+  panTimer=setInterval(()=>{
+    if(!ac || !panner || mode!=="8d" || audio.paused) return;
+    const speed=0.018 + (Number(strength.value)/100)*0.035;
+    panPhase += speed;
+    const panValue=Math.sin(panPhase);
+    panner.pan.setTargetAtTime(panValue,ac.currentTime,0.12);
+  },40);
+}
+
+function applyMode(){
+  if(!ac) return;
+  const s=Number(strength.value)/100;
+
+  bass.gain.setTargetAtTime(mode==="bass" ? 5+13*s : 0,ac.currentTime,0.05);
+
+  reverbGain.gain.setTargetAtTime(
+    mode==="concert" ? 0.2+0.45*s :
+    mode==="slowed" ? 0.12+0.25*s : 0,
+    ac.currentTime,0.08
+  );
+
+  delayGain.gain.setTargetAtTime(mode==="echo" ? 0.25+0.35*s : 0,ac.currentTime,0.05);
+  feedback.gain.setTargetAtTime(mode==="echo" ? 0.15+0.38*s : 0,ac.currentTime,0.05);
+  delay.delayTime.setTargetAtTime(mode==="echo" ? 0.2+0.25*s : 0.3,ac.currentTime,0.05);
+
+  if(mode==="nightcore"){
+    audio.playbackRate=1+0.4*s;
+  }else if(mode==="slowed"){
+    audio.playbackRate=1-0.4*s;
+  }else{
+    audio.playbackRate=1;
   }
 
-  function setButtons(enabled) {
-    play.disabled = !enabled;
-    stop.disabled = !enabled;
-    seek.disabled = !enabled;
-    recordBtn.disabled = !enabled;
+  if(mode==="8d"){
+    startPan();
+  }else{
+    stopPan();
   }
 
-  function createImpulse() {
-    const length = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
-
-    for (let channel = 0; channel < 2; channel++) {
-      const data = buffer.getChannelData(channel);
-      for (let i = 0; i < length; i++) {
-        data[i] = (Math.random() * 2 - 1) *
-          Math.pow(1 - i / length, 2.5);
-      }
-    }
-    return buffer;
+  if(mode==="mono"){
+    panner.pan.setTargetAtTime(0,ac.currentTime,0.1);
   }
 
-  function initAudio() {
-    if (ctx) return;
-
-    const AudioContextClass =
-      window.AudioContext || window.webkitAudioContext;
-
-    if (!AudioContextClass) {
-      throw new Error("Please open this app in Chrome.");
-    }
-
-    ctx = new AudioContextClass();
-
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = 512;
-
-    bass = ctx.createBiquadFilter();
-    bass.type = "lowshelf";
-    bass.frequency.value = 150;
-
-    mid = ctx.createBiquadFilter();
-    mid.type = "peaking";
-    mid.frequency.value = 1000;
-    mid.Q.value = 1;
-
-    treble = ctx.createBiquadFilter();
-    treble.type = "highshelf";
-    treble.frequency.value = 5000;
-
-    panner = ctx.createStereoPanner();
-
-    dry = ctx.createGain();
-    echoGain = ctx.createGain();
-    delay = ctx.createDelay(1);
-    feedback = ctx.createGain();
-
-    delay.delayTime.value = 0.28;
-    feedback.gain.value = 0.2;
-
-    convolver = ctx.createConvolver();
-    convolver.buffer = createImpulse();
-
-    master = ctx.createGain();
-
-    source = ctx.createMediaElementSource(audio);
-
-    source.connect(bass);
-    bass.connect(mid);
-    mid.connect(treble);
-    treble.connect(panner);
-
-    panner.connect(dry);
-    dry.connect(master);
-
-    panner.connect(delay);
-    delay.connect(feedback);
-    feedback.connect(delay);
-    delay.connect(echoGain);
-    echoGain.connect(master);
-
-    panner.connect(convolver);
-    convolver.connect(master);
-
-    master.connect(analyser);
-    analyser.connect(ctx.destination);
-
-    applyMode();
-  }
-
-  function applyMode() {
-    if (ctx && bass) {
-      bass.gain.value =
-        mode === "bass" ? amount * 18 : 0;
-
-      mid.gain.value =
-        mode === "bass" ? amount * 3 : 0;
-
-      treble.gain.value =
-        mode === "bass" ? amount * 2 : 0;
-
-      echoGain.gain.value =
-        mode === "echo" ? amount * 0.6 :
-        mode === "slowed" ? amount * 0.35 : 0;
-
-      feedback.gain.value =
-        mode === "echo" ? 0.25 + amount * 0.3 : 0.18;
-
-      delay.delayTime.value =
-        mode === "echo" ? 0.22 + amount * 0.25 : 0.3;
-
-      dry.gain.value =
-        mode === "concert" ? 1 - amount * 0.25 : 1;
-
-      convolver.normalize = true;
-      convolver.connect(master);
-    }
-
-    if (audio) {
-      audio.playbackRate =
-        mode === "slowed" ? 1 - amount * 0.3 :
-        mode === "nightcore" ? 1 + amount * 0.3 : 1;
-
-      audio.preservesPitch = false;
-    }
-
-    const labels = {
-      "8d": "8D ROTATION",
-      bass: "BASS BOOST",
-      slowed: "SLOWED + REVERB",
-      nightcore: "NIGHTCORE",
-      echo: "ECHO SPACE",
-      concert: "CONCERT HALL",
-      mono: "MONO CENTER",
-      clean: "ORIGINAL / CLEAN"
-    };
-
-    $("activeMode").textContent = labels[mode];
-
-    document.querySelectorAll(".mode").forEach(button => {
-      button.classList.toggle("active", button.dataset.mode === mode);
-    });
-  }
-
-  file.addEventListener("change", () => {
-    const f = file.files && file.files[0];
-    if (!f) return;
-
-    const id = ++loadingId;
-
-    if (audio) {
-      audio.pause();
-      audio.removeAttribute("src");
-      audio.load();
-    }
-
-    if (objectURL) URL.revokeObjectURL(objectURL);
-
-    audio = new Audio();
-    audio.preload = "auto";
-    audio.playsInline = true;
-    objectURL = URL.createObjectURL(f);
-    audio.src = objectURL;
-
-    $("filename").textContent = f.name;
-    time.textContent = "00:00 / 00:00";
-    seek.value = 0;
-    setButtons(false);
-    say("Loading audio: " + f.name);
-
-    audio.addEventListener("loadedmetadata", () => {
-      if (id !== loadingId) return;
-
-      time.textContent = "00:00 / " + fmt(audio.duration);
-      setButtons(true);
-      say("Song loaded. Choose a mode and press Play.");
-    });
-
-    audio.addEventListener("canplay", () => {
-      if (id !== loadingId) return;
-      setButtons(true);
-      say("Audio ready. Press Play.");
-    });
-
-    audio.addEventListener("timeupdate", () => {
-      if (!audio || id !== loadingId) return;
-
-      time.textContent =
-        fmt(audio.currentTime) + " / " + fmt(audio.duration);
-
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        seek.value = audio.currentTime / audio.duration * 1000;
-      }
-    });
-
-    audio.addEventListener("ended", () => {
-      play.textContent = "▶ Play";
-      say("Song finished.");
-    });
-
-    audio.addEventListener("error", () => {
-      if (id !== loadingId) return;
-
-      setButtons(false);
-
-      const code = audio.error ? audio.error.code : 0;
-
-      if (code === 4) {
-        say("Audio format unsupported. Try another standard MP3 file.");
-      } else if (code === 3) {
-        say("Audio decoding failed. Try a different MP3 or WAV.");
-      } else {
-        say("Audio could not load. Try selecting the song again.");
-      }
-    });
-
-    audio.load();
-  });
-
-  document.querySelectorAll(".mode").forEach(button => {
-    button.addEventListener("click", () => {
-      mode = button.dataset.mode;
-      applyMode();
-
-      say(audio
-        ? "Mode selected: " + button.querySelector("strong").textContent
-        : "Mode selected. Upload a song to begin.");
-    });
-  });
-
-  $("amount").addEventListener("input", event => {
-    amount = Number(event.target.value) / 100;
-    $("amountVal").textContent = event.target.value + "%";
-    applyMode();
-  });
-
-  $("rotation").addEventListener("input", event => {
-    rotation = Number(event.target.value) / 100;
-    $("rotationVal").textContent = event.target.value + "%";
-  });
-
-  play.addEventListener("click", async () => {
-    if (!audio) {
-      say("Please select a song first.");
-      return;
-    }
-
-    try {
-      initAudio();
-
-      if (ctx.state === "suspended") await ctx.resume();
-
-      applyMode();
-
-      if (audio.paused) {
-        await audio.play();
-        play.textContent = "Ⅱ Pause";
-        say("Playing audio.");
-      } else {
-        audio.pause();
-        play.textContent = "▶ Play";
-        say("Paused.");
-      }
-    } catch (error) {
-      say("Playback error: " + error.message);
-    }
-  });
-
-  stop.addEventListener("click", () => {
-    if (!audio) return;
-
-    audio.pause();
-    audio.currentTime = 0;
-    play.textContent = "▶ Play";
-    say("Stopped.");
-  });
-
-  seek.addEventListener("input", () => {
-    if (audio && Number.isFinite(audio.duration)) {
-      audio.currentTime = Number(seek.value) / 1000 * audio.duration;
-    }
-  });
-
-  recordBtn.addEventListener("click", async () => {
-    if (!audio) return;
-
-    try {
-      initAudio();
-
-      if (ctx.state === "suspended") await ctx.resume();
-
-      if (!window.MediaRecorder) {
-        say("Recording is not supported by this browser.");
-        return;
-      }
-
-      if (recorder && recorder.state === "recording") {
-        recorder.stop();
-        return;
-      }
-
-      const output = ctx.createMediaStreamDestination();
-      master.connect(output);
-
-      chunks = [];
-      recorder = new MediaRecorder(output.stream);
-
-      recorder.ondataavailable = event => {
-        if (event.data.size) chunks.push(event.data);
-      };
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, {
-          type: recorder.mimeType || "audio/webm"
-        });
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "BeatMorph-processed.webm";
-        link.click();
-
-        setTimeout(() => URL.revokeObjectURL(url), 3000);
-        recordBtn.textContent = "● Record & Export Audio";
-        say("Processed audio exported as WebM.");
-        master.disconnect(output);
-      };
-
-      recorder.start();
-      recordBtn.textContent = "■ Stop & Save";
-      say("Recording started. Press Stop & Save when finished.");
-    } catch (error) {
-      say("Recording error: " + error.message);
-    }
-  });
-
-  // Keep the visualization running.
-  const canvas = $("viz");
-  const c = canvas.getContext("2d");
-
-  function draw() {
-    const w = canvas.width;
-    const h = canvas.height;
-
-    c.fillStyle = "#05050c";
-    c.fillRect(0, 0, w, h);
-
-    const cx = w / 2;
-    const cy = h / 2;
-    const data = new Uint8Array(256);
-
-    if (analyser) analyser.getByteFrequencyData(data);
-
-    for (let i = 0; i < 80; i++) {
-      const angle = i * Math.PI * 2 / 80;
-      const value = analyser ? data[i] / 255 : 0.12;
-      const radius = 55 + value * 130;
-
-      c.fillStyle = `hsl(${270 + i}, 90%, 65%)`;
-      c.fillRect(
-        cx + Math.cos(angle) * radius - 2,
-        cy + Math.sin(angle) * radius * 0.65 - 2,
-        4, 4
-      );
-    }
-
+  say("Selected: "+mode.toUpperCase()+" · Strength "+strength.value+"%");
+}
+
+function drawVisualizer(){
+  const data=new Uint8Array(analyser.frequencyBinCount);
+  function draw(){
     requestAnimationFrame(draw);
+    if(!analyser) return;
+    analyser.getByteFrequencyData(data);
+    canvasCtx.clearRect(0,0,canvas.width,canvas.height);
+    const barWidth=canvas.width/data.length;
+    for(let i=0;i<data.length;i++){
+      const h=(data[i]/255)*canvas.height;
+      canvasCtx.fillStyle=mode==="8d" ? "#a697ff" : "#61e6b3";
+      canvasCtx.fillRect(i*barWidth,canvas.height-h,Math.max(1,barWidth-1),h);
+    }
   }
-
-
-
   draw();
+}
+
+fileInput.addEventListener("change",()=>{
+  const file=fileInput.files && fileInput.files[0];
+  if(!file) return;
+
+  if(objectURL) URL.revokeObjectURL(objectURL);
+  objectURL=URL.createObjectURL(file);
+  audio.src=objectURL;
+  audio.load();
+  playBtn.disabled=false;
+  stopBtn.disabled=false;
+  say("Loaded: "+file.name+" · Play dabao.");
+});
+
+playBtn.addEventListener("click",async()=>{
+  if(!initAudio()) return;
+  try{
+    await ac.resume();
+    applyMode();
+    await audio.play();
+    if(mode==="8d") startPan();
+    say("Playing: "+(fileInput.files[0]?.name || "Audio"));
+  }catch(error){
+    say("Audio play nahi hua. Dobara Play dabao ya doosri file select karo.");
+  }
+});
+
+stopBtn.addEventListener("click",()=>{
+  audio.pause();
+  audio.currentTime=0;
+  stopPan();
+});
+
+document.querySelectorAll(".mode").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".mode").forEach(b=>b.classList.remove("active"));
+    button.classList.add("active");
+    mode=button.dataset.mode;
+    if(ac) applyMode();
+    else say("Selected: "+mode.toUpperCase()+" · Play dabao.");
+  });
+});
+
+strength.addEventListener("input",()=>{
+  $("strengthValue").textContent=strength.value+"%";
+  if(ac) applyMode();
+});
+
+volume.addEventListener("input",()=>{
+  $("volumeValue").textContent=volume.value+"%";
+  if(ac) master.gain.setTargetAtTime(Number(volume.value)/100,ac.currentTime,0.05);
+});
+
+audio.addEventListener("pause",stopPan);
+audio.addEventListener("ended",stopPan);
+audio.addEventListener("play",()=>{
+  if(ac && ac.state==="suspended") ac.resume();
+  if(mode==="8d") startPan();
+});
+
+say("Apni audio file select karo.");
 })();
 </script>
 </body>
 </html>
-
