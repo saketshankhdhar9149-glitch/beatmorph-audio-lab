@@ -1,34 +1,33 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#10131c">
 <title>BeatMorph Audio Lab</title>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b0e15;color:#f4f6ff;font-family:Arial,sans-serif}
-main{max-width:850px;margin:auto;padding:20px}
-header{text-align:center;padding:15px}
-h1{font-size:38px;margin:5px}
-p{color:#b5bfd3}
-.panel{background:#151a26;border:1px solid #30384d;border-radius:18px;padding:16px;margin:15px 0}
+main{max-width:850px;margin:auto;padding:18px}
+header{text-align:center;padding:12px}
+h1{font-size:38px;margin:6px}
+p,.muted{color:#b7c0d4}
+.panel{background:#151a26;border:1px solid #30384d;border-radius:17px;padding:17px;margin:14px 0}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
 button{padding:12px;border:1px solid #39425b;border-radius:11px;background:#252c40;color:white;font-size:15px;cursor:pointer}
 button:disabled{opacity:.5}
-.primary{background:#9b8cff;color:#111;border:0;font-weight:bold}
-.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-#audio{width:100%;margin-top:15px}
+.primary{background:#a697ff;color:#111;border:0;font-weight:bold}
+#audio{width:100%;margin-top:14px}
 .modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.mode{text-align:left;min-height:65px}
+.mode{text-align:left;min-height:66px}
 .mode strong,.mode small{display:block}
 .mode small{color:#bbc3d6;margin-top:5px}
-.mode.active{border-color:#a697ff;background:#393052}
+.mode.active{border-color:#a697ff;background:#393052;box-shadow:inset 0 0 0 1px #a697ff}
 input[type=range]{width:100%;accent-color:#a697ff}
-label{display:block;margin:16px 0 6px}
+label{display:block;margin:16px 0 7px}
 #status{font-size:14px;overflow-wrap:anywhere}
-canvas{width:100%;height:90px;background:#080b11;border-radius:10px;margin-top:12px}
+canvas{display:block;width:100%;height:90px;background:#080b11;border-radius:10px;margin-top:12px}
 @media(max-width:420px){main{padding:10px}.modes{grid-template-columns:1fr}}
 </style>
 </head>
@@ -36,42 +35,42 @@ canvas{width:100%;height:90px;background:#080b11;border-radius:10px;margin-top:1
 <main>
 <header>
 <h1>BeatMorph</h1>
-<p>Audio Lab — Apne music ko naye effects do 🎧</p>
+<p>Audio Lab · Make your music immersive 🎧</p>
 </header>
 
 <section class="panel">
-<h3>1. Apna song select karo</h3>
+<h3>1. Choose your song</h3>
 <div class="row">
 <input type="file" id="file" accept="audio/*">
 <button id="play" class="primary" disabled>▶ Play</button>
 <button id="stop" disabled>■ Stop</button>
 </div>
-<audio id="audio" controls></audio>
-<p id="status">Pehle apna audio file select karo.</p>
+<audio id="audio" controls preload="metadata"></audio>
+<p id="status">Select an audio file from your device.</p>
 <canvas id="viz" width="800" height="90"></canvas>
 </section>
 
 <section class="panel">
-<h3>2. Audio mode select karo</h3>
+<h3>2. Audio modes</h3>
 <div class="modes">
 <button class="mode active" data-mode="original"><strong>Original / Clean</strong><small>Normal sound</small></button>
-<button class="mode" data-mode="8d"><strong>🎧 8D Audio</strong><small>Left ↔ Right movement</small></button>
-<button class="mode" data-mode="bass"><strong>🔊 Bass Boost</strong><small>Heavy bass</small></button>
-<button class="mode" data-mode="slowed"><strong>🐢 Slowed + Reverb</strong><small>Slow music + space</small></button>
-<button class="mode" data-mode="nightcore"><strong>⚡ Nightcore</strong><small>Fast music</small></button>
+<button class="mode" data-mode="8d"><strong>🎧 8D Immersive</strong><small>Beat-responsive movement</small></button>
+<button class="mode" data-mode="bass"><strong>🔊 Bass Boost</strong><small>More low-end</small></button>
+<button class="mode" data-mode="slowed"><strong>🐢 Slowed + Reverb</strong><small>Slow and spacious</small></button>
+<button class="mode" data-mode="nightcore"><strong>⚡ Nightcore</strong><small>Faster playback</small></button>
 <button class="mode" data-mode="echo"><strong>🔁 Echo</strong><small>Repeating sound</small></button>
-<button class="mode" data-mode="concert"><strong>🏟 Concert Hall</strong><small>Hall reverb</small></button>
-<button class="mode" data-mode="mono"><strong>🎙 Mono Center</strong><small>Center sound</small></button>
+<button class="mode" data-mode="concert"><strong>🏟 Concert Hall</strong><small>Hall-like reverb</small></button>
+<button class="mode" data-mode="mono"><strong>🎙 Mono Center</strong><small>Centered sound</small></button>
 </div>
 </section>
 
 <section class="panel">
 <h3>3. Effect settings</h3>
-<label>Effect Strength: <span id="strengthValue">70%</span></label>
-<input type="range" id="strength" min="0" max="100" value="70">
-<label>Volume: <span id="volumeValue">80%</span></label>
-<input type="range" id="volume" min="0" max="100" value="80">
-<p>8D effect ko achchhe se sunne ke liye stereo headphones use karo.</p>
+<label>Effect Strength: <span id="strengthValue">75%</span></label>
+<input type="range" id="strength" min="0" max="100" value="75">
+<label>Volume: <span id="volumeValue">75%</span></label>
+<input type="range" id="volume" min="0" max="100" value="75">
+<p class="muted">Best experience ke liye stereo headphones use karo. Volume low se start karo.</p>
 </section>
 </main>
 
@@ -86,89 +85,111 @@ const status = $("status");
 const strength = $("strength");
 const volume = $("volume");
 const canvas = $("viz");
-const canvasCtx = canvas.getContext("2d");
+const cv = canvas.getContext("2d");
 
 let ac = null;
-let source, bass, panner, master, analyser;
+let source, bass, panner, master, analyser, bassAnalyser;
 let dry, reverb, reverbGain, delay, delayGain, feedback;
 let mode = "original";
 let panTimer = null;
 let panPhase = 0;
+let smoothedBass = 0;
+let lastBeatTime = 0;
+let beatPulse = 0;
 let objectURL = null;
+let vizStarted = false;
 
-function say(message){ status.textContent = message; }
+function say(text){status.textContent=text;}
 
-function makeImpulse(seconds=2.5){
-  const length = Math.floor(ac.sampleRate * seconds);
-  const buffer = ac.createBuffer(2,length,ac.sampleRate);
+function makeImpulse(seconds=3, decay=2.2){
+  const length=Math.floor(ac.sampleRate*seconds);
+  const buffer=ac.createBuffer(2,length,ac.sampleRate);
   for(let ch=0;ch<2;ch++){
     const data=buffer.getChannelData(ch);
     for(let i=0;i<length;i++){
-      data[i]=(Math.random()*2-1)*Math.pow(1-i/length,2.5);
+      const fade=Math.pow(1-i/length,decay);
+      data[i]=(Math.random()*2-1)*fade;
     }
   }
   return buffer;
 }
 
 function initAudio(){
-  if(ac) return true;
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if(!AudioContextClass){
-    say("Web Audio support nahi hai. Updated Chrome use karo.");
+  if(ac)return true;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){say("Web Audio supported nahi hai. Chrome update karo.");return false;}
+
+  try{
+    ac=new AC();
+    source=ac.createMediaElementSource(audio);
+
+    bass=ac.createBiquadFilter();
+    bass.type="lowshelf";
+    bass.frequency.value=150;
+    bass.gain.value=0;
+
+    // Stereo left-right movement
+    panner=ac.createStereoPanner();
+    panner.pan.value=0;
+
+    // Dry/original signal
+    dry=ac.createGain();
+    dry.gain.value=1;
+
+    // Reverb effect
+    reverb=ac.createConvolver();
+    reverb.buffer=makeImpulse();
+    reverbGain=ac.createGain();
+    reverbGain.gain.value=0;
+
+    // Echo effect
+    delay=ac.createDelay(1.5);
+    delay.delayTime.value=.32;
+    feedback=ac.createGain();
+    feedback.gain.value=0;
+    delayGain=ac.createGain();
+    delayGain.gain.value=0;
+
+    // Analysers for beat detection and visualization
+    bassAnalyser=ac.createAnalyser();
+    bassAnalyser.fftSize=1024;
+    analyser=ac.createAnalyser();
+    analyser.fftSize=256;
+
+    master=ac.createGain();
+    master.gain.value=Number(volume.value)/100;
+
+    // Main audio path
+    source.connect(bass);
+    bass.connect(bassAnalyser);
+    bassAnalyser.connect(panner);
+
+    panner.connect(dry);
+    dry.connect(master);
+
+    // Separate reverb path
+    panner.connect(reverb);
+    reverb.connect(reverbGain);
+    reverbGain.connect(master);
+
+    // Separate echo path with feedback
+    panner.connect(delay);
+    delay.connect(delayGain);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    delayGain.connect(master);
+
+    master.connect(analyser);
+    analyser.connect(ac.destination);
+
+    startVisualizer();
+    applyMode();
+    return true;
+  }catch(err){
+    console.error(err);
+    say("Audio engine start nahi hua. Page refresh karke dobara try karo.");
     return false;
   }
-
-  ac = new AudioContextClass();
-  source = ac.createMediaElementSource(audio);
-
-  bass = ac.createBiquadFilter();
-  bass.type = "lowshelf";
-  bass.frequency.value = 150;
-
-  panner = ac.createStereoPanner();
-  dry = ac.createGain();
-  dry.gain.value = 1;
-
-  reverb = ac.createConvolver();
-  reverb.buffer = makeImpulse();
-  reverbGain = ac.createGain();
-  reverbGain.gain.value = 0;
-
-  delay = ac.createDelay(1);
-  delay.delayTime.value = 0.3;
-  feedback = ac.createGain();
-  feedback.gain.value = 0;
-  delayGain = ac.createGain();
-  delayGain.gain.value = 0;
-
-  master = ac.createGain();
-  master.gain.value = Number(volume.value)/100;
-
-  analyser = ac.createAnalyser();
-  analyser.fftSize = 256;
-
-  source.connect(bass);
-  bass.connect(panner);
-
-  panner.connect(dry);
-  dry.connect(master);
-
-  panner.connect(reverb);
-  reverb.connect(reverbGain);
-  reverbGain.connect(master);
-
-  panner.connect(delay);
-  delay.connect(delayGain);
-  delay.connect(feedback);
-  feedback.connect(delay);
-  delayGain.connect(master);
-
-  master.connect(analyser);
-  analyser.connect(ac.destination);
-
-  drawVisualizer();
-  applyMode();
-  return true;
 }
 
 function stopPan(){
@@ -176,81 +197,141 @@ function stopPan(){
     clearInterval(panTimer);
     panTimer=null;
   }
-  if(ac && panner){
-    panner.pan.setTargetAtTime(0,ac.currentTime,0.15);
+  if(ac&&panner){
+    panner.pan.setTargetAtTime(0,ac.currentTime,.2);
   }
 }
 
 function startPan(){
-  if(panTimer) clearInterval(panTimer);
+  if(panTimer)clearInterval(panTimer);
+
+  const data=new Uint8Array(bassAnalyser.frequencyBinCount);
+
   panTimer=setInterval(()=>{
-    if(!ac || !panner || mode!=="8d" || audio.paused) return;
-    const speed=0.018 + (Number(strength.value)/100)*0.035;
-    panPhase += speed;
-    const panValue=Math.sin(panPhase);
-    panner.pan.setTargetAtTime(panValue,ac.currentTime,0.12);
-  },40);
+    if(!ac||!panner||mode!=="8d"||audio.paused)return;
+
+    bassAnalyser.getByteTimeDomainData(data);
+
+    // Estimate low-frequency energy from the bass-filtered signal.
+    // This is an energy envelope, not full musical beat recognition.
+    let energy=0;
+    const end=Math.min(160,data.length);
+    for(let i=0;i<end;i++){
+      const v=(data[i]-128)/128;
+      energy+=v*v;
+    }
+    energy=Math.sqrt(energy/Math.max(1,end));
+
+    smoothedBass=smoothedBass*.88+energy*.12;
+    const now=performance.now();
+
+    // Detect a relative energy rise; impose a short cooldown.
+    if(energy>Math.max(.025,smoothedBass*1.3)&&now-lastBeatTime>180){
+      beatPulse=1;
+      lastBeatTime=now;
+    }else{
+      beatPulse*=.91;
+    }
+
+    const s=Number(strength.value)/100;
+
+    // Base orbit moves around the stereo field.
+    // The beat pulse slightly changes the movement rate and width.
+    panPhase += .018 + s*.025 + beatPulse*.018;
+    let pan=Math.sin(panPhase);
+
+    // Beat-responsive widening and gentle counter-movement.
+    pan=pan*(.45+.5*s)+Math.sin(panPhase*.47)*(.12*s);
+    pan=Math.max(-1,Math.min(1,pan));
+
+    panner.pan.setTargetAtTime(pan,ac.currentTime,.11);
+  },35);
 }
 
 function applyMode(){
-  if(!ac) return;
+  if(!ac)return;
   const s=Number(strength.value)/100;
 
-  bass.gain.setTargetAtTime(mode==="bass" ? 5+13*s : 0,ac.currentTime,0.05);
+  // Reset all effect sends first to avoid effects leaking between modes.
+  let reverbAmount=0;
+  let echoAmount=0;
+  let echoFeedback=0;
+  let bassAmount=0;
 
-  reverbGain.gain.setTargetAtTime(
-    mode==="concert" ? 0.2+0.45*s :
-    mode==="slowed" ? 0.12+0.25*s : 0,
-    ac.currentTime,0.08
-  );
-
-  delayGain.gain.setTargetAtTime(mode==="echo" ? 0.25+0.35*s : 0,ac.currentTime,0.05);
-  feedback.gain.setTargetAtTime(mode==="echo" ? 0.15+0.38*s : 0,ac.currentTime,0.05);
-  delay.delayTime.setTargetAtTime(mode==="echo" ? 0.2+0.25*s : 0.3,ac.currentTime,0.05);
-
-  if(mode==="nightcore"){
-    audio.playbackRate=1+0.4*s;
+  if(mode==="bass"){
+    bassAmount=5+15*s;
+  }else if(mode==="8d"){
+    // Spatial depth plus subtle echoes help create an immersive feel.
+    reverbAmount=.12+.30*s;
+    echoAmount=.07+.16*s;
+    echoFeedback=.12+.17*s;
   }else if(mode==="slowed"){
-    audio.playbackRate=1-0.4*s;
+    reverbAmount=.18+.32*s;
+  }else if(mode==="echo"){
+    echoAmount=.25+.45*s;
+    echoFeedback=.18+.38*s;
+  }else if(mode==="concert"){
+    reverbAmount=.28+.52*s;
+  }
+
+  bass.gain.setTargetAtTime(bassAmount,ac.currentTime,.06);
+  reverbGain.gain.setTargetAtTime(reverbAmount,ac.currentTime,.08);
+  delayGain.gain.setTargetAtTime(echoAmount,ac.currentTime,.06);
+  feedback.gain.setTargetAtTime(echoFeedback,ac.currentTime,.06);
+
+  const delayTime=mode==="8d"?.22+.12*s:
+                  mode==="echo"?.28+.35*s:.32;
+  delay.delayTime.setTargetAtTime(delayTime,ac.currentTime,.08);
+
+  // Speed modes
+  if(mode==="nightcore"){
+    audio.playbackRate=1+.40*s;
+  }else if(mode==="slowed"){
+    audio.playbackRate=1-.35*s;
   }else{
     audio.playbackRate=1;
   }
 
-  if(mode==="8d"){
+  if(mode==="mono"){
+    panner.pan.setTargetAtTime(0,ac.currentTime,.08);
+    stopPan();
+  }else if(mode==="8d"){
     startPan();
   }else{
     stopPan();
   }
 
-  if(mode==="mono"){
-    panner.pan.setTargetAtTime(0,ac.currentTime,0.1);
-  }
-
-  say("Selected: "+mode.toUpperCase()+" · Strength "+strength.value+"%");
+  const active=document.querySelector(".mode.active strong");
+  say("Mode: "+(active?active.textContent:mode)+" · Strength "+strength.value+"%");
 }
 
-function drawVisualizer(){
-  const data=new Uint8Array(analyser.frequencyBinCount);
+function startVisualizer(){
+  if(vizStarted)return;
+  vizStarted=true;
+  const data=new Uint8Array(128);
+
   function draw(){
     requestAnimationFrame(draw);
-    if(!analyser) return;
+    if(!analyser)return;
     analyser.getByteFrequencyData(data);
-    canvasCtx.clearRect(0,0,canvas.width,canvas.height);
-    const barWidth=canvas.width/data.length;
+    cv.clearRect(0,0,canvas.width,canvas.height);
+    const bw=canvas.width/data.length;
+
     for(let i=0;i<data.length;i++){
-      const h=(data[i]/255)*canvas.height;
-      canvasCtx.fillStyle=mode==="8d" ? "#a697ff" : "#61e6b3";
-      canvasCtx.fillRect(i*barWidth,canvas.height-h,Math.max(1,barWidth-1),h);
+      const h=data[i]/255*canvas.height;
+      cv.fillStyle=mode==="8d"?"#a697ff":
+                   mode==="bass"?"#ff9b6a":"#61e6b3";
+      cv.fillRect(i*bw,canvas.height-h,Math.max(1,bw-1),h);
     }
   }
   draw();
 }
 
 fileInput.addEventListener("change",()=>{
-  const file=fileInput.files && fileInput.files[0];
-  if(!file) return;
+  const file=fileInput.files&&fileInput.files[0];
+  if(!file)return;
 
-  if(objectURL) URL.revokeObjectURL(objectURL);
+  if(objectURL)URL.revokeObjectURL(objectURL);
   objectURL=URL.createObjectURL(file);
   audio.src=objectURL;
   audio.load();
@@ -260,15 +341,16 @@ fileInput.addEventListener("change",()=>{
 });
 
 playBtn.addEventListener("click",async()=>{
-  if(!initAudio()) return;
+  if(!initAudio())return;
   try{
     await ac.resume();
     applyMode();
     await audio.play();
-    if(mode==="8d") startPan();
-    say("Playing: "+(fileInput.files[0]?.name || "Audio"));
-  }catch(error){
-    say("Audio play nahi hua. Dobara Play dabao ya doosri file select karo.");
+    if(mode==="8d")startPan();
+    say("Playing · "+(fileInput.files[0]?.name||"Audio"));
+  }catch(err){
+    console.error(err);
+    say("Play nahi hua. Play dobara dabao ya doosri audio file try karo.");
   }
 });
 
@@ -278,34 +360,41 @@ stopBtn.addEventListener("click",()=>{
   stopPan();
 });
 
-document.querySelectorAll(".mode").forEach(button=>{
-  button.addEventListener("click",()=>{
+document.querySelectorAll(".mode").forEach(btn=>{
+  btn.addEventListener("click",()=>{
     document.querySelectorAll(".mode").forEach(b=>b.classList.remove("active"));
-    button.classList.add("active");
-    mode=button.dataset.mode;
-    if(ac) applyMode();
-    else say("Selected: "+mode.toUpperCase()+" · Play dabao.");
+    btn.classList.add("active");
+    mode=btn.dataset.mode;
+
+    if(ac)applyMode();
+    else{
+      if(mode==="nightcore")audio.playbackRate=1.25;
+      else audio.playbackRate=1;
+      say("Selected: "+btn.querySelector("strong").textContent+" · Play dabao.");
+    }
   });
 });
 
 strength.addEventListener("input",()=>{
   $("strengthValue").textContent=strength.value+"%";
-  if(ac) applyMode();
+  if(ac)applyMode();
 });
 
 volume.addEventListener("input",()=>{
   $("volumeValue").textContent=volume.value+"%";
-  if(ac) master.gain.setTargetAtTime(Number(volume.value)/100,ac.currentTime,0.05);
+  if(master&&ac){
+    master.gain.setTargetAtTime(Number(volume.value)/100,ac.currentTime,.05);
+  }
 });
 
 audio.addEventListener("pause",stopPan);
 audio.addEventListener("ended",stopPan);
 audio.addEventListener("play",()=>{
-  if(ac && ac.state==="suspended") ac.resume();
-  if(mode==="8d") startPan();
+  if(ac&&ac.state==="suspended")ac.resume();
+  if(mode==="8d")startPan();
 });
 
-say("Apni audio file select karo.");
+say("Choose a song from your device.");
 })();
 </script>
 </body>
