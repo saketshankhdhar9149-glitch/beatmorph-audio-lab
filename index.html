@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090914"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>BeatMorph Audio Lab</title>
+<style>
+:root{--bg:#090914;--panel:#141425;--line:#302d4b;--txt:#f8f7ff;--muted:#aaa7c5;--purple:#a855f7;--cyan:#22d3ee}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#281047 0,transparent 43%),var(--bg);color:var(--txt);font:15px/1.5 system-ui,Arial,sans-serif}
+header{padding:22px clamp(16px,4vw,45px);border-bottom:1px solid #ffffff14;display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.logo{font-size:23px;font-weight:900;letter-spacing:.1em}.logo span{color:#c084fc}.sub{font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+main{max-width:1150px;margin:auto;padding:28px 16px 50px}.hero{margin-bottom:23px}.hero h1{font-size:clamp(29px,5vw,48px);line-height:1.1;margin:0 0 10px}.hero p{color:var(--muted);max-width:720px;margin:0}.layout{display:grid;grid-template-columns:1fr 330px;gap:17px}.card{background:linear-gradient(145deg,#171729,#10101b);border:1px solid var(--line);border-radius:18px;overflow:hidden}.cardhead{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.cardhead b{font-size:12px;letter-spacing:.12em}.pill{border:1px solid #64408a;border-radius:99px;padding:5px 10px;font-size:11px;color:#e9d5ff}
+.visual{height:265px;position:relative;background:#05050c;overflow:hidden}.visual canvas{width:100%;height:100%;display:block}.vislabel{position:absolute;bottom:13px;left:16px;color:#e9d5ff;font-size:11px;letter-spacing:.16em}
+.controls{padding:18px;display:flex;flex-direction:column;gap:17px}.section{font-size:11px;color:#c4b5fd;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px}.file{padding:14px;border:1px dashed #5b4776;border-radius:12px;background:#ffffff04}.file input{width:100%;color:var(--muted);font-size:12px}.filename{color:#c4b5fd;font-size:12px;overflow-wrap:anywhere;margin-top:7px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mode{padding:12px 10px;text-align:left;color:#f5f3ff;background:#0c0c18;border:1px solid #34314e;border-radius:12px;cursor:pointer;min-height:76px}.mode strong{display:block;font-size:13px}.mode small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.mode.active{border-color:#c084fc;background:linear-gradient(145deg,#32134b,#171226);box-shadow:0 0 0 1px #a855f744}.field label{display:flex;justify-content:space-between;color:#ded9ef;font-size:12px;margin-bottom:6px}.field input{width:100%;accent-color:#c084fc}.buttons{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid #42395d;background:#211a34;color:#fff;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer}.btn.primary{background:linear-gradient(100deg,#9333ea,#6d28d9);border:0}.btn:disabled{opacity:.4;cursor:not-allowed}.full{width:100%}.transport{display:flex;gap:9px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);flex-wrap:wrap}.time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.seek{flex:1;min-width:100px;accent-color:#c084fc}.status{color:#a5f3fc;font-size:12px;min-height:18px}.hint{font-size:11px;color:#8f8ba9}.bottom{margin-top:17px;padding:16px 18px}.bottom h3{margin:0 0 8px;font-size:13px}.bottom p{color:var(--muted);font-size:12px;margin:0}.tagrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{background:#201832;border:1px solid #3b2c54;padding:5px 9px;border-radius:99px;font-size:11px;color:#e9d5ff}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.visual{height:220px}}@media(max-width:480px){.modes{grid-template-columns:1fr 1fr}.hero h1{font-size:31px}}
+</style>
+</head>
+<body>
+<header><div><div class="logo">BEAT<span>MORPH</span></div><div class="sub">Audio transformation lab</div></div><div class="pill">BETA · LOCAL AUDIO PROCESSING</div></header>
+<main>
+<div class="hero"><h1>Feel your music <span style="color:#c084fc">in a new dimension.</span></h1><p>Upload a song, choose an audio effect mode, listen with headphones, then record the processed output. The effects change the sound itself—not just the visualizer.</p></div>
+<div class="layout">
+<section>
+<div class="card">
+<div class="cardhead"><b>SPATIAL AUDIO PREVIEW</b><span class="pill" id="activeMode">8D ROTATION</span></div>
+<div class="visual"><canvas id="viz" width="1000" height="500"></canvas><div class="vislabel" id="visualLabel">LEFT ◀ · SOUND MOVES AROUND YOU · ▶ RIGHT</div></div>
+<div class="transport"><button class="btn primary" id="play" disabled>▶ Play</button><button class="btn" id="stop" disabled>■ Stop</button><input class="seek" id="seek" type="range" min="0" max="1000" value="0" disabled><span class="time" id="time">00:00 / 00:00</span></div>
+</div>
+<div class="card bottom"><h3>What the modes change</h3><p>8D rotates stereo position; Bass Boost enhances low frequencies; Slowed + Reverb lowers playback speed and adds an echoing space; Nightcore raises speed and pitch; Echo adds repeats; Concert adds a spacious reverberant feel.</p><div class="tagrow"><span class="tag">🎧 Headphones recommended</span><span class="tag">🎵 MP3 / WAV</span><span class="tag">⬇ Export processed audio</span></div></div>
+</section>
+<aside class="card controls">
+<div><div class="section">01 / Upload a song</div><div class="file"><input id="file" type="file" accept="audio/*"><div class="filename" id="filename">Choose an audio file from your laptop.</div></div></div>
+<div><div class="section">02 / Choose audio mode</div><div class="modes">
+<button class="mode active" data-mode="8d"><strong>🌀 8D Audio</strong><small>Rotating left ↔ right</small></button>
+<button class="mode" data-mode="bass"><strong>💥 Bass Boost</strong><small>Deeper low end</small></button>
+<button class="mode" data-mode="slowed"><strong>🌙 Slowed + Reverb</strong><small>Slower, spacious sound</small></button>
+<button class="mode" data-mode="nightcore"><strong>⚡ Nightcore</strong><small>Faster, higher pitch</small></button>
+<button class="mode" data-mode="echo"><strong>🌌 Echo Space</strong><small>Repeating delay</small></button>
+<button class="mode" data-mode="concert"><strong>🏛️ Concert Hall</strong><small>Room-like reverb</small></button>
+<button class="mode" data-mode="mono"><strong>🎙️ Mono Center</strong><small>Centered sound</small></button>
+<button class="mode" data-mode="clean"><strong>✨ Original / Clean</strong><small>Effects bypassed</small></button>
+</div></div>
+<div class="field"><label for="amount">Effect intensity <span id="amountVal">70%</span></label><input id="amount" type="range" min="0" max="100" value="70"></div>
+<div class="field"><label for="rotation">8D rotation speed <span id="rotationVal">50%</span></label><input id="rotation" type="range" min="10" max="100" value="50"></div>
+<div><div class="section">03 / Export processed track</div><button class="btn primary full" id="record" disabled>● Record & Export Audio</button><div class="status" id="status" style="margin-top:9px">Upload a song to begin.</div></div>
+<p class="hint">Exports in browser-supported WebM audio format. Re-import it into an editor if you need MP3/WAV. No audio is uploaded to a server.</p>
+</aside>
+</div>
+<p class="hint" style="margin-top:17px">Use audio you own or have permission to modify. 8D is a stereo panning effect, not a guaranteed true binaural recording. Effect quality depends on the source track, playback equipment, and browser support.</p>
+</main>
+<script>
+(()=>{
+const canvas=document.getElementById('viz'),c=canvas.getContext('2d');
+const file=document.getElementById('file'),play=document.getElementById('play'),stop=document.getElementById('stop'),seek=document.getElementById('seek'),time=document.getElementById('time'),status=document.getElementById('status'),recordBtn=document.getElementById('record');
+let audio=null,ctx=null,analyser=null,source=null,panner=null,bass=null,mid=null,treble=null,delay=null,feedback=null,wet=null,dry=null,master=null,dest=null,convolver=null,impulse=null,mode='8d',amount=.7,rotation=.5,rec=null,chunks=[],raf=0;
+function say(s){status.textContent=s}function fmt(t){t=Math.max(0,t||0);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0')}
+function makeImpulse(ac,seconds=2.8,decay=2.4){let len=ac.sampleRate*seconds,b=ac.createBuffer(2,len,ac.sampleRate);for(let ch=0;ch<2;ch++){let d=b.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)}return b}
+function init(){
+ if(ctx)return;
+ const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+ if(!AudioContextClass)throw new Error('Web Audio is not supported in this browser.');
+ ctx=new AudioContextClass();analyser=ctx.createAnalyser();analyser.fftSize=512;analyser.smoothingTimeConstant=.82;
+ panner=ctx.createStereoPanner();bass=ctx.createBiquadFilter();bass.type='lowshelf';bass.frequency.value=150;bass.gain.value=0;
+ mid=ctx.createBiquadFilter();mid.type='peaking';mid.frequency.value=1000;mid.Q.value=1;mid.gain.value=0;
+ treble=ctx.createBiquadFilter();treble.type='highshelf';treble.frequency.value=5000;treble.gain.value=0;
+ delay=ctx.createDelay(1);delay.delayTime.value=.28;feedback=ctx.createGain();feedback.gain.value=.18;wet=ctx.createGain();wet.gain.value=0;dry=ctx.createGain();dry.gain.value=1;
+ convolver=ctx.createConvolver();convolver.buffer=makeImpulse(ctx);master=ctx.createGain();dest=ctx.createMediaStreamDestination();
+ // Base EQ chain -> spatial panner -> dry output. Delay and reverb are parallel effect paths.
+ source=ctx.createMediaElementSource(audio);source.connect(bass);bass.connect(mid);mid.connect(treble);treble.connect(panner);panner.connect(dry);dry.connect(master);
+ panner.connect(delay);delay.connect(feedback);feedback.connect(delay);delay.connect(wet);wet.connect(master);
+ panner.connect(convolver);convolver.connect(wet);
+ master.connect(analyser);analyser.connect(ctx.destination);analyser.connect(dest);
+}
+function applyMode(){
+ if(!ctx)return;
+ bass.gain.value=mode==='bass'?amount*18:mode==='slowed'?amount*3:0;
+ mid.gain.value=mode==='bass'?amount*2:0;
+ treble.gain.value=mode==='bass'?amount*2:0;
+ wet.gain.value=(mode==='echo'?amount*.65:mode==='concert'?amount*.5:mode==='slowed'?amount*.58:0);
+ feedback.gain.value=mode==='echo'?.22+amount*.38:.15;
+ delay.delayTime.value=mode==='echo'?.22+amount*.28:.32;
+ dry.gain.value=mode==='concert'?1-amount*.2:1;
+ audio.playbackRate=mode==='slowed'?1-amount*.28:mode==='nightcore'?1+amount*.32:1;
+ audio.preservesPitch=false;
+ document.getElementById('activeMode').textContent=({8d:'8D ROTATION',bass:'BASS BOOST',slowed:'SLOWED + REVERB',nightcore:'NIGHTCORE',echo:'ECHO SPACE',concert:'CONCERT HALL',mono:'MONO CENTER',clean:'ORIGINAL / CLEAN'})[mode];
+ document.getElementById('visualLabel').textContent=mode==='8d'?'LEFT ◀ · SOUND MOVES AROUND YOU · ▶ RIGHT':mode==='mono'?'CENTERED SOUND · MONO MODE':mode.toUpperCase()+' · AUDIO EFFECT ACTIVE';
+}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;applyMode();say('Mode selected: '+b.querySelector('strong').textContent)}));
+document.getElementById('amount').addEventListener('input',e=>{amount=+e.target.value/100;document.getElementById('amountVal').textContent=e.target.value+'%';applyMode()});
+document.getElementById('rotation').addEventListener('input',e=>{rotation=+e.target.value/100;document.getElementById('rotationVal').textContent=e.target.value+'%'});
+file.addEventListener('change',()=>{let f=file.files&&file.files[0];if(!f)return;if(audio){audio.pause();URL.revokeObjectURL(audio.src)}audio=new Audio();audio.preload='metadata';audio.src=URL.createObjectURL(f);audio.load();
+ document.getElementById('filename').textContent=f.name;
+ say('Selected: '+f.name+' — loading audio…');
+ audio.addEventListener('loadedmetadata',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=false;time.textContent='00:00 / '+fmt(audio.duration);say('Track loaded. Choose a mode and press Play.')},{once:true});
+ audio.addEventListener('canplay',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=false;say('Audio ready. Choose a mode and press Play.')},{once:true});
+ audio.addEventListener('error',()=>{play.disabled=stop.disabled=seek.disabled=recordBtn.disabled=true;let code=audio.error?audio.error.code:0;let msg=code===4?'This audio format is not supported here. Try a standard MP3 file.':code===2?'File could not be read. Copy it to Downloads and select it again.':'Audio could not load. Try another MP3/WAV file.';say(msg);time.textContent='00:00 / 00:00';});});
+play.addEventListener('click',async()=>{if(!audio)return;try{init();if(ctx.state==='suspended')await ctx.resume();applyMode();if(!audio.paused){audio.pause();play.textContent='▶ Play';say('Paused.')}else{await audio.play();play.textContent='Ⅱ Pause';say('Playing processed audio. Headphones recommended.')}}catch(e){say('Playback failed. Try another audio file or current Chrome/Edge.')}});
+stop.addEventListener('click',()=>{if(!audio)return;audio.pause();audio.currentTime=0;play.textContent='▶ Play';say('Stopped.')});seek.addEventListener('input',()=>{if(audio&&isFinite(audio.duration))audio.currentTime=seek.value/1000*audio.duration});
+recordBtn.addEventListener('click',async()=>{if(!audio)return;try{init();if(ctx.state==='suspended')await ctx.resume();applyMode();if(rec&&rec.state==='recording'){rec.stop();return}
+ if(!window.MediaRecorder){say('This browser does not support recording. Try desktop Chrome or Edge.');return}
+ const stream=dest.stream;chunks=[];let opts={};if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))opts.mimeType='audio/webm;codecs=opus';rec=new MediaRecorder(stream,opts);rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{let blob=new Blob(chunks,{type:rec.mimeType||'audio/webm'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='BeatMorph-processed-audio.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);recordBtn.textContent='● Record & Export Audio';say('Export saved as WebM audio. Convert to MP3/WAV in an audio editor if needed.')};rec.start();recordBtn.textContent='■ Stop & Save';say('Recording processed audio now. Press Stop & Save when finished.');}catch(e){say('Recording could not start. Try Chrome or Edge.')}});
+function draw(t){let w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;let grad=c.createRadialGradient(cx,cy,20,cx,cy,w*.65);grad.addColorStop(0,'#28104b');grad.addColorStop(1,'#03030a');c.fillStyle=grad;c.fillRect(0,0,w,h);let energy=.15,arr=null;if(analyser){arr=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(arr);energy=arr.reduce((a,b)=>a+b,0)/(arr.length*255)}let spin=t*.00045*rotation*(mode==='8d'?1:.35);for(let ring=0;ring<15;ring++){let radius=25+((ring/15+(t*.000035*rotation)%1)*230);c.beginPath();for(let i=0;i<=180;i++){let a=i/180*Math.PI*2+spin;let v=arr?arr[Math.floor(i/180*arr.length)]/255:energy;let r=radius+v*18*amount;let x=cx+Math.cos(a)*r*1.35,y=cy+Math.sin(a)*r*.72;if(i===0)c.moveTo(x,y);else c.lineTo(x,y)}c.closePath();c.strokeStyle=`hsla(${275+ring*5},100%,${50+ring*2}%,${.15+ring*.045})`;c.lineWidth=1+ring*.09;c.shadowBlur=15;c.shadowColor='#a855f7';c.stroke()}c.shadowBlur=0;for(let i=0;i<90;i++){let a=i*2.399+t*.00015*rotation,r=70+(i%30)*6;let x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r*.65;c.fillStyle=`hsla(${185+i%100},100%,70%,.6)`;c.fillRect(x,y,2,2)}c.textAlign='center';c.font='bold 20px system-ui';c.fillStyle='#ffffffbb';c.fillText('BEATMORPH',cx,h-22);raf=requestAnimationFrame(draw)}draw(0);
+})();
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
+</body></html>
