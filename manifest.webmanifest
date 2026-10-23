@@ -1,0 +1,19 @@
+
+{
+  "name": "BeatMorph Audio Lab",
+  "short_name": "BeatMorph",
+  "description": "Transform music with 8D, bass boost, slowed reverb, echo and more.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090914",
+  "theme_color": "#090914",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
